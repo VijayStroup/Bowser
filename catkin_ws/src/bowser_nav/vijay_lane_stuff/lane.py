@@ -6,13 +6,15 @@ whether it should move left or right to stay within the lines.
 
 import os
 import cv2
+from PIL import ImageGrab
+import numpy as np
 from feed import Feed
 
 
 if __name__ == '__main__':
-    raw_feed = 'road1.jpg'
+    raw_feed = 'stream'
 
-    if not os.path.isfile(raw_feed):
+    if raw_feed[-3:] in ['jpg', 'mp4'] and not os.path.isfile(raw_feed):
         print('feed does not exist.')
         exit(-1)
 
@@ -27,7 +29,13 @@ if __name__ == '__main__':
             feed = Feed(frame, 'video')
             feed.robo_vis()
             if feed.show_lanes() == -2: break
-    elif raw_feed_type == feed_types[2]: # stream
-        pass
+    elif raw_feed == 'stream': # stream
+        """its getting the stream of desktop from inside wsl and not whats on my windows"""
+        while True:
+            screen = np.array(ImageGrab.grab(bbox=(0, 0, 800, 640)))
+            cv2.imshow('', cv2.cvtColor(screen, cv2.COLOR_BGR2RGB))
+            if cv2.waitKey(25) & 0xFF == ord('q'):
+                cv2.destroyAllWindows()
+                break
     else: # camera
         pass
